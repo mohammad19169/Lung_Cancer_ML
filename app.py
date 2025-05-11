@@ -81,13 +81,13 @@ if selection == 'Introduction':
     - Only 41.8% of male patients were non-smokers
     """)
 
-    st.title("Not just a Delhi phenomenon")
+    st.title("Not just a Lahore phenomenon")
     st.image(Image.open("images/stove.png"), caption='Indoor pollution is also a major cause', width=650)
     
     st.markdown("""
-    - 48% of patients in eastern India had no smoking exposure
-    - 89% of women patients had never smoked
-    - Only 28% of men patients had never smoked
+    - 87.6% of adults in Pakistan had no smoking exposure
+    - 97.9% of women in Pakistan had never smoked
+    - Only 77.8% of men in Pakistan had never smoked
     """)
 
 # Dataset page
