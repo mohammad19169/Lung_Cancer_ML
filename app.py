@@ -10,10 +10,8 @@ from tensorflow.keras.preprocessing import image
 from tempfile import NamedTemporaryFile
 from streamlit_option_menu import option_menu
 
-# Page configuration
 st.set_page_config(page_title='Lung Cancer Detection')
 
-# Custom model loader to handle DepthwiseConv2D version mismatch
 def load_custom_model(model_path):
     """Handles version mismatch for DepthwiseConv2D by filtering the 'groups' parameter"""
     with CustomObjectScope({
@@ -21,7 +19,6 @@ def load_custom_model(model_path):
     }):
         return load_model(model_path, compile=False)
 
-# Loading models with caching
 @st.cache_resource
 def load_cancer_model():
     return pickle.load(open('models/final_model.sav', 'rb'))
@@ -37,7 +34,6 @@ def load_cnn_model():
 cancer_model = load_cancer_model()
 cnn_model = load_cnn_model()
 
-# Sidebar navigation
 with st.sidebar:
     selection = option_menu(
         'Lung Cancer Detection System',
@@ -51,7 +47,6 @@ with st.sidebar:
         default_index=0
     )
 
-# Introduction page
 if selection == 'Introduction':
     st.image(Image.open("images/lung-cancer.jpg"), caption='Introduction to Lung Cancer', width=600)
     
@@ -90,7 +85,6 @@ if selection == 'Introduction':
     - Only 77.8% of men in Pakistan had never smoked
     """)
 
-# Dataset page
 if selection == 'About the Dataset':
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "Dataset analysis", "Training Data", "Test Data", "Algorithms Used", 'CNN Based Identification'
@@ -222,25 +216,21 @@ if selection == 'About the Dataset':
         with col2:
             st.image(Image.open("images/loss.png"), caption='Training vs Validation Loss', width=350)
 
-# Lung Cancer Prediction page
 if selection == 'Lung Cancer Prediction':
     st.title('Lung Cancer Prediction using ML')
 
-    # Load test data
     testx = pd.read_csv("datasets/testx.csv", index_col=0)
     testy = pd.read_csv("datasets/testy.csv", index_col=0)
     testx.reset_index(drop=True, inplace=True)
     testy.reset_index(drop=True, inplace=True)
     concate_data = pd.concat([testx, testy], axis=1)
 
-    # Slider to select test case
     idn = st.slider('Select test case index', 0, len(concate_data)-1, 25)
     st.write(f"Displaying values of index {idn}")
     
     if st.button('Show this test case'):
         st.write(list(concate_data.iloc[idn]))
 
-    # Get values from selected test case
     values = concate_data.iloc[idn]
     Age = values[0]
     Gender = values[1]
@@ -260,7 +250,6 @@ if selection == 'Lung Cancer Prediction':
     DryCough = values[15]
     Snoring = values[16]
 
-    # Input fields
     col1, col2, col3 = st.columns(3)
     with col1:
         Age = st.text_input('Age', value=Age)
@@ -302,7 +291,6 @@ if selection == 'Lung Cancer Prediction':
     with col2:
         Snoring = st.text_input('Snoring', value=Snoring)
 
-    # Prediction button
     if st.button('Predict Lung Cancer Risk'):
         try:
             prediction = cancer_model.predict([[
@@ -325,7 +313,6 @@ if selection == 'Lung Cancer Prediction':
     expander = st.expander("Sample Test Data")
     expander.write(concate_data.head(5))
 
-# CNN Based Prediction page
 if selection == 'CNN Based Disease Prediction':
     st.title('Lung Cancer Detection using CNN and CT-Scan Images')
     
@@ -337,24 +324,20 @@ if selection == 'CNN Based Disease Prediction':
     
     if uploaded_file is not None:
         try:
-            # Display file info
             st.write({
                 "Filename": uploaded_file.name,
                 "Type": uploaded_file.type,
                 "Size": f"{uploaded_file.size / 1024:.2f} KB"
             })
             
-            # Display image
             img = Image.open(uploaded_file)
             st.image(img, caption='Uploaded CT-Scan', use_container_width=True)
             
-            # Preprocess image
             img = img.resize((224, 224))
             img_array = image.img_to_array(img)
             img_array = img_array / 255.0
             img_array = np.expand_dims(img_array, axis=0)
             
-            # Make prediction
             prediction = cnn_model.predict(img_array)
             confidence = prediction[0][0]
             
@@ -367,7 +350,6 @@ if selection == 'CNN Based Disease Prediction':
         except Exception as e:
             st.error(f"Image processing error: {str(e)}")
 
-# Hide Streamlit style elements
 hide_st_style = """
     <style>
     #MainMenu {visibility: hidden;}
